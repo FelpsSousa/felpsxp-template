@@ -1,0 +1,60 @@
+# pre-commit: https://pre-commit.com
+# Install once per clone:   pre-commit install
+# Run everything manually:  pre-commit run --all-files
+# Update hook versions:     pre-commit autoupdate
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+minimum_pre_commit_version: "4.0.0"
+
+repos:
+  # --- General hygiene ------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
+  # --- Secrets --------------------------------------------------------------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # --- Conventional Commits on the commit message ---------------------------
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, security]
+
+  # --- Stack-specific hooks: uncomment what the project uses ----------------
+  # Python (ruff lint + format):
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.17.1
+  #   hooks:
+  #     - id: ruff-check
+  #       args: [--fix]
+  #     - id: ruff-format
+  #
+  # JS/TS: prefer the project's own linter through a local hook, e.g.
+  # - repo: local
+  #   hooks:
+  #     - id: lint-staged
+  #       name: lint-staged
+  #       entry: pnpm exec lint-staged
+  #       language: system
+  #       pass_filenames: false

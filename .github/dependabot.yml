@@ -1,0 +1,71 @@
+# Dependabot version updates.
+# Commit messages follow Conventional Commits (chore(deps): ...).
+# Minor and patch updates are grouped to keep PR noise low.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: America/Sao_Paulo
+    commit-message:
+      prefix: ci
+      include: scope
+    labels: ["dependencies", "area: ci"]
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # --- Enable the blocks for the stack this project uses ---------------------
+  # (scripts/init-template.sh does it for you when package.json / pyproject.toml exist)
+
+  # npm-start
+  # - package-ecosystem: npm            # also covers pnpm (pnpm-lock.yaml)
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #     time: "07:00"
+  #     timezone: America/Sao_Paulo
+  #   commit-message:
+  #     prefix: chore
+  #     prefix-development: chore
+  #     include: scope
+  #   labels: ["dependencies", "area: js"]
+  #   open-pull-requests-limit: 5
+  #   groups:
+  #     minor-and-patch:
+  #       update-types: ["minor", "patch"]
+  # npm-end
+
+  # pip-start
+  # - package-ecosystem: pip            # also covers uv / pyproject.toml
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #     time: "07:00"
+  #     timezone: America/Sao_Paulo
+  #   commit-message:
+  #     prefix: chore
+  #     include: scope
+  #   labels: ["dependencies", "area: python"]
+  #   open-pull-requests-limit: 5
+  #   groups:
+  #     minor-and-patch:
+  #       update-types: ["minor", "patch"]
+  # pip-end
+
+  # docker-start
+  # - package-ecosystem: docker
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     timezone: America/Sao_Paulo
+  #   commit-message:
+  #     prefix: chore
+  #     include: scope
+  #   labels: ["dependencies", "area: docker"]
+  # docker-end

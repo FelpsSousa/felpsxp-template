@@ -1,0 +1,57 @@
+# --- Secrets & local config (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# --- Node / TypeScript ---
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+.turbo/
+.vercel/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# --- Infra ---
+.terraform/
+*.tfstate*
+docker-compose.override.yml
+
+# --- Logs & temp ---
+*.log
+tmp/
+.cache/
+
+# --- Claude Code local settings ---
+.claude/settings.local.json
+CLAUDE.local.md

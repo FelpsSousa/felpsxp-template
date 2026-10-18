@@ -1,0 +1,133 @@
+# CI for FelpsXP repositories.
+# - hygiene: pre-commit hooks on every file + gitleaks over the full git history
+# - node / python: run only when the stack exists (package.json / pyproject.toml)
+# Actions are pinned to commit SHAs (tag in the comment); Dependabot keeps them current.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITLEAKS_VERSION: 8.30.1
+  PRE_COMMIT_VERSION: 4.7.0
+
+jobs:
+  hygiene:
+    name: Hygiene & secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run pre-commit on all files
+        env:
+          # no-commit-to-branch would fail on pushes to main; gitleaks runs below on full history.
+          SKIP: no-commit-to-branch,gitleaks
+        run: |
+          pip install "pre-commit==${PRE_COMMIT_VERSION}"
+          pre-commit run --all-files --show-diff-on-failure --color=always
+
+      - name: Install gitleaks (checksum verified)
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "${base}/${tarball}"
+          curl -sSfL "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt" -o checksums.txt
+          sha256sum --check --ignore-missing checksums.txt
+          tar -xzf "${tarball}" gitleaks
+          rm -f "${tarball}" checksums.txt
+
+      - name: Scan full history for secrets
+        run: ./gitleaks git . --redact --no-banner --verbose
+
+  detect:
+    name: Detect stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      node: ${{ steps.stack.outputs.node }}
+      python: ${{ steps.stack.outputs.python }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: stack
+        run: |
+          echo "node=$([ -f package.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "python=$([ -f pyproject.toml ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  node:
+    name: Node (lint · typecheck · test · build)
+    needs: detect
+    if: needs.detect.outputs.node == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Reads the pnpm version from "packageManager" in package.json.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run --if-present lint
+      - run: pnpm run --if-present typecheck
+      - run: pnpm run --if-present test
+      - run: pnpm run --if-present build
+
+  python:
+    name: Python (ruff · pytest)
+    needs: detect
+    if: needs.detect.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          if [ -f uv.lock ]; then uv sync --locked --all-extras; else uv sync --all-extras; fi
+
+      - name: Lint and format check
+        run: |
+          uv run --with ruff ruff check .
+          uv run --with ruff ruff format --check .
+
+      - name: Tests
+        run: |
+          if [ -d tests ]; then uv run --with pytest pytest; else echo "No tests/ directory yet."; fi

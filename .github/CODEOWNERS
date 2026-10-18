@@ -1,0 +1,10 @@
+# Owners are requested for review automatically. Last matching pattern wins.
+# When the felpsxp-hq org has teams, switch to e.g. @felpsxp-hq/maintainers.
+
+*                     @FelpsSousa
+
+# Sensitive paths: changes here always need the owner's eyes.
+/.github/             @FelpsSousa
+/docs/adr/            @FelpsSousa
+/SECURITY.md          @FelpsSousa
+/CLAUDE.md            @FelpsSousa

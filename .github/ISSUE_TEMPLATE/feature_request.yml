@@ -1,0 +1,34 @@
+name: Feature request
+description: Propose a new capability or an improvement.
+title: "feat: <short description>"
+labels: ["type: feature", "status: triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this solve, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: architecture
+    attributes:
+      label: Architecture impact
+      options:
+        - label: This changes architecture, data model, a public contract or a major dependency (needs an ADR)
+        - label: This touches CORE integration (auth, database, event bus, design system)
+  - type: input
+    id: fxp
+    attributes:
+      label: Registry ID (optional)
+      description: FXP-xxx item in the FelpsXP master registry, if any.
