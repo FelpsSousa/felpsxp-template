@@ -16,7 +16,7 @@ Thank you for helping keep **{{PROJECT_NAME}}** and its users safe.
 
 Report privately through GitHub:
 **Security → Advisories → Report a vulnerability**
-(`https://github.com/felpsxp-hq/{{PROJECT_NAME}}/security/advisories/new`).
+(`https://github.com/{{OWNER}}/{{PROJECT_NAME}}/security/advisories/new`).
 
 Please include:
 
@@ -47,9 +47,9 @@ findings that require a compromised device, and vulnerabilities in third-party s
 
 ## Safe harbor
 
-Good-faith research that respects this policy — no data destruction, no privacy violations,
-no service disruption, and only the minimum access needed to demonstrate the issue — will not
-be pursued legally. Personal data you may encounter must not be kept or shared (LGPD).
+Good-faith research that respects this policy will not be pursued legally. That means no data
+destruction, no privacy violations, no service disruption, and only the minimum access needed
+to demonstrate the issue. Personal data you may encounter must not be kept or shared (LGPD).
 
 ## Practices in this repository
 

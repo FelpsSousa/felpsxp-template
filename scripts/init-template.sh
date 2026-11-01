@@ -3,20 +3,25 @@
 #
 #   ./scripts/init-template.sh --name felpsxp-news \
 #       --description "Bilingual AI-summarized news portal" \
-#       --fxp FXP-050 [--github]
+#       --fxp FXP-050 [--owner FelpsSousa] [--github]
 #
-# What it does:
-#   1. Replaces {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}} and {{FXP_ID}} in every text file.
+# What it does, in this order:
+#   1. Replaces {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}}, {{FXP_ID}} and {{OWNER}} in every text file.
 #   2. Enables the Dependabot blocks for the stacks it finds (package.json, pyproject.toml, Dockerfile).
-#   3. With --github (needs an authenticated `gh`): creates labels and applies repository
-#      settings — squash-only merges, branch auto-delete, secret scanning + push protection,
-#      private vulnerability reporting, and a ruleset protecting main.
-#   4. Removes TEMPLATE.md and this script, then installs the pre-commit hooks if available.
+#   3. Removes TEMPLATE.md and this script.
+#   4. Inside a git repository: creates the "chore: initialize from felpsxp-template" commit
+#      (bypassing the no-commit-to-branch hook only for this first commit).
+#   5. With --github (needs an authenticated `gh`): pushes that commit, then creates labels and
+#      applies repository settings (squash-only merges, branch auto-delete, secret scanning with
+#      push protection, private vulnerability reporting) and, last, the ruleset protecting main.
+#      Protection comes after the push on purpose: the ruleset would reject a direct push.
+#   6. Installs the pre-commit hooks if pre-commit is available.
 set -euo pipefail
 
 name="$(basename "$(pwd)")"
 description=""
 fxp="FXP-xxx"
+owner="FelpsSousa"
 github=false
 
 while [[ $# -gt 0 ]]; do
@@ -24,8 +29,9 @@ while [[ $# -gt 0 ]]; do
     --name) name="$2"; shift 2 ;;
     --description) description="$2"; shift 2 ;;
     --fxp) fxp="$2"; shift 2 ;;
+    --owner) owner="$2"; shift 2 ;;
     --github) github=true; shift ;;
-    -h|--help) sed -n '2,17p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
   esac
 done
@@ -43,13 +49,14 @@ root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$root"
 
 echo "→ Filling placeholders for $name ($fxp)"
-export TPL_NAME="$name" TPL_DESC="$description" TPL_FXP="$fxp"
+export TPL_NAME="$name" TPL_DESC="$description" TPL_FXP="$fxp" TPL_OWNER="$owner"
 grep -rIl --exclude-dir=.git --exclude=init-template.sh --exclude=TEMPLATE.md \
-  -e '{{PROJECT_NAME}}' -e '{{PROJECT_DESCRIPTION}}' -e '{{FXP_ID}}' . |
+  -e '{{PROJECT_NAME}}' -e '{{PROJECT_DESCRIPTION}}' -e '{{FXP_ID}}' -e '{{OWNER}}' . |
   while IFS= read -r file; do
     perl -pi -e 's/\{\{PROJECT_NAME\}\}/$ENV{TPL_NAME}/g;
                  s/\{\{PROJECT_DESCRIPTION\}\}/$ENV{TPL_DESC}/g;
-                 s/\{\{FXP_ID\}\}/$ENV{TPL_FXP}/g' "$file"
+                 s/\{\{FXP_ID\}\}/$ENV{TPL_FXP}/g;
+                 s/\{\{OWNER\}\}/$ENV{TPL_OWNER}/g' "$file"
   done
 
 enable_dependabot() {
@@ -62,9 +69,25 @@ enable_dependabot() {
 [[ -f pyproject.toml ]] && enable_dependabot pip
 [[ -f Dockerfile || -f docker/Dockerfile ]] && enable_dependabot docker
 
+rm -f TEMPLATE.md
+rm -f -- "$0"
+rmdir scripts 2>/dev/null || true
+
+committed=false
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  git add -A
+  # The no-commit-to-branch hook would block this first commit on main; skip it only here.
+  SKIP=no-commit-to-branch git commit -q -m "chore: initialize from felpsxp-template" &&
+    committed=true && echo "→ Created the initial commit"
+fi
+
 if $github; then
   command -v gh >/dev/null || { echo "error: gh CLI not found" >&2; exit 1; }
   repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+  if $committed; then
+    echo "→ Pushing the initial commit"
+    git push -q origin HEAD
+  fi
   echo "→ Configuring $repo"
 
   while IFS='|' read -r label color desc; do
@@ -122,9 +145,6 @@ JSON
     echo "  ! could not create the ruleset (it may already exist)"
 fi
 
-rm -f TEMPLATE.md
-rm -f -- "$0"
-rmdir scripts 2>/dev/null || true
 
 if command -v pre-commit >/dev/null; then
   pre-commit install
@@ -138,5 +158,5 @@ cat <<EOF
   1. Settings → Code security: enable CodeQL "default setup" and Dependabot security updates.
   2. Fill in README.md, README.pt-BR.md and CLAUDE.md (overview, stack, commands).
   3. Write ADR-0002 with the project's first real decision.
-  4. Commit:  git add -A && git commit -m "chore: initialize from felpsxp-template"
+  4. From now on, work on branches and open PRs; main only changes through them.
 EOF

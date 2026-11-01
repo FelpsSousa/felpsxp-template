@@ -17,12 +17,12 @@
 
 ## Options considered
 
-### Option A — <name>
+### Option A: <name>
 
 - ✅ <pro>
 - ❌ <con>
 
-### Option B — <name>
+### Option B: <name>
 
 - ✅ <pro>
 - ❌ <con>

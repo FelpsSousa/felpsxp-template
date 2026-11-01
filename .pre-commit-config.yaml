@@ -41,6 +41,15 @@ repos:
         stages: [commit-msg]
         args: [feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, security]
 
+  # --- Writing style: no em or en dashes in prose ----------------------------
+  - repo: local
+    hooks:
+      - id: no-em-dash
+        name: no em or en dashes in prose
+        language: pygrep
+        entry: "\u2013|\u2014"
+        files: \.(md|mdx|txt)$
+
   # --- Stack-specific hooks: uncomment what the project uses ----------------
   # Python (ruff lint + format):
   # - repo: https://github.com/astral-sh/ruff-pre-commit

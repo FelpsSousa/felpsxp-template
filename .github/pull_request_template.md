@@ -1,5 +1,5 @@
 <!--
-PR title must be a Conventional Commit — it becomes the squash commit on main.
+PR title must be a Conventional Commit: it becomes the squash commit on main.
 Example: feat(ingest): add RSS source adapter
 -->
 

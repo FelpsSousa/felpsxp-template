@@ -14,8 +14,8 @@ execution).
 
 Two problems follow from that:
 
-1. **Lost reasoning.** Months later, nobody — including the author or an AI assistant
-   reading the repo cold — remembers *why* a choice was made, so it gets revisited and
+1. **Lost reasoning.** Months later, nobody (including the author or an AI assistant
+   reading the repo cold) remembers *why* a choice was made, so it gets revisited and
    reworked. Avoiding rework is a core value of the ecosystem.
 2. **Public evidence.** Repositories double as a portfolio. Recruiters and collaborators
    should see how decisions were reached, not only the resulting code.
@@ -25,7 +25,7 @@ Two problems follow from that:
 Every repository records its significant decisions as **Architecture Decision Records**
 in `docs/adr/`.
 
-- **What needs an ADR:** anything that is costly to reverse or that shapes other work —
+- **What needs an ADR:** anything that is costly to reverse or that shapes other work:
   architecture, data model and storage, public APIs and contracts, framework or major
   dependency choices, security and privacy model, hosting and deployment, cross-module
   integration with CORE.
@@ -64,4 +64,4 @@ in `docs/adr/`.
 ## References
 
 - Michael Nygard, *Documenting Architecture Decisions* (2011)
-- [MADR — Markdown Architectural Decision Records](https://adr.github.io/madr/)
+- [MADR: Markdown Architectural Decision Records](https://adr.github.io/madr/)

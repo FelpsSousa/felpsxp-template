@@ -11,7 +11,9 @@ This guide describes how work flows from idea to `main`.
 1. **Architecture before code.** A change that alters structure, data model, a public
    contract or a dependency choice starts with an ADR in [`docs/adr/`](docs/adr/README.md).
 2. **One thing at a time.** Small, focused PRs. One concern per PR.
-3. **Security first.** No secrets in the repo, least privilege everywhere, personal data
+3. **Write with care.** Follow the writing style in [CLAUDE.md](CLAUDE.md#writing-style):
+   no em or en dashes, no filler, correct grammar in English and Portuguese.
+4. **Security first.** No secrets in the repo, least privilege everywhere, personal data
    handled according to LGPD.
 
 ## Workflow
@@ -26,7 +28,7 @@ This guide describes how work flows from idea to `main`.
    docs/adr-0002-database
    ```
 
-3. **Install the hooks once** — they run formatting, secret scanning and commit-message checks:
+3. **Install the hooks once**; they run formatting, secret scanning and commit-message checks:
 
    ```bash
    pre-commit install

@@ -4,7 +4,7 @@
 
 **English** · [Português (BR)](README.pt-BR.md)
 
-[![CI](https://github.com/felpsxp-hq/{{PROJECT_NAME}}/actions/workflows/ci.yml/badge.svg)](https://github.com/felpsxp-hq/{{PROJECT_NAME}}/actions/workflows/ci.yml)
+[![CI](https://github.com/{{OWNER}}/{{PROJECT_NAME}}/actions/workflows/ci.yml/badge.svg)](https://github.com/{{OWNER}}/{{PROJECT_NAME}}/actions/workflows/ci.yml)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-fe5196.svg)](https://www.conventionalcommits.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -20,7 +20,7 @@ Part of the **FelpsXP digital ecosystem** · Registry ID: `{{FXP_ID}}`
 ## Architecture
 
 <!-- High-level diagram (C4 level 1/2) and the main components.
-     Every significant decision lives in docs/adr/ — link the relevant ADRs here. -->
+     Every significant decision lives in docs/adr/; link the relevant ADRs here. -->
 
 | Layer    | Choice |
 | -------- | ------ |
@@ -41,7 +41,7 @@ See [Architecture Decision Records](docs/adr/README.md).
 ### Setup
 
 ```bash
-git clone https://github.com/felpsxp-hq/{{PROJECT_NAME}}.git
+git clone https://github.com/{{OWNER}}/{{PROJECT_NAME}}.git
 cd {{PROJECT_NAME}}
 pre-commit install          # installs pre-commit and commit-msg hooks
 cp .env.example .env        # never commit .env

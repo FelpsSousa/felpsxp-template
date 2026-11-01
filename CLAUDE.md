@@ -9,7 +9,7 @@ Keep it short and current: update it in the same PR whenever setup, commands or 
 - **Registry ID:** `{{FXP_ID}}` in the FelpsXP master registry (Registro Mestre).
   Claude Code cannot update the registry; when status, scope or stack changes, say so at the
   end of the session so Felps can sync it.
-- **Owner:** Felipe "Felps" Sousa (@FelpsSousa) · org `felpsxp-hq`.
+- **Owner:** Felipe "Felps" Sousa (@FelpsSousa) · repository owner `{{OWNER}}` (the `felpsxp-hq` org is reserved for later).
 - **Ecosystem:** one module of the FelpsXP digital ecosystem. Modules are independent and
   pluggable, integrating with the shared CORE (auth/IAM, database, API gateway, design system,
   event bus) instead of reimplementing it.
@@ -17,7 +17,7 @@ Keep it short and current: update it in the same PR whenever setup, commands or 
 ## How we work
 
 - **Architecture before code.** Anything costly to reverse (architecture, data model, public
-  contract, framework or major dependency, security model) needs an ADR in `docs/adr/` first —
+  contract, framework or major dependency, security model) needs an ADR in `docs/adr/` first;
   see ADR-0001. Propose it, wait for agreement, then implement.
 - **One thing at a time.** Small, focused changes; finish one step before starting the next.
 - **Planning happens in Claude chat; execution happens here.** If a task needs an
@@ -27,6 +27,18 @@ Keep it short and current: update it in the same PR whenever setup, commands or 
   according to LGPD.
 - **Language:** code, comments, commits, ADRs and public docs in English. Felps talks in
   Brazilian Portuguese; reply in Portuguese in chat.
+
+## Writing style
+
+Applies to everything written in this repository and in replies to Felps, in English and in
+Portuguese.
+
+- Never use em dashes or en dashes. Use a comma, a colon, a semicolon, parentheses or a new
+  sentence instead. A pre-commit hook blocks them in Markdown and text files.
+- No AI-sounding prose: no stock openings, empty catchphrases, "it's not X, it's Y" constructions
+  or lists of clichés. Say the specific thing.
+- Write with care in both languages: rich vocabulary, correct punctuation (commas, semicolons,
+  colons, quotation marks) and sound grammar. Prefer fluent, descriptive prose to fragments.
 
 ## Conventions
 
@@ -59,8 +71,8 @@ Keep it short and current: update it in the same PR whenever setup, commands or 
 
 ## Map
 
-- `docs/adr/` — decisions (source of truth for *why*)
-- `.github/` — CI, Dependabot, templates, CODEOWNERS
+- `docs/adr/`: decisions (source of truth for *why*)
+- `.github/`: CI, Dependabot, templates, CODEOWNERS
 - <!-- add main source folders here -->
 
 ## Do not
