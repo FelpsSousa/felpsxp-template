@@ -37,3 +37,14 @@ jobs:
           subjectPattern: ^(?![A-Z]).+$
           subjectPatternError: |
             The subject "{subject}" must start with a lowercase letter.
+
+      # Skips Dependabot: its bodies quote upstream release notes this repository does not write.
+      - name: No AI attribution footer in the description
+        if: github.event.pull_request.user.login != 'dependabot[bot]'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if printf '%s\n' "$PR_BODY" | grep -Eiq '^[[:space:]]*(co-authored-by:.*(claude|anthropic)|[^[:space:]]*[[:space:]]*generated with .*claude)'; then
+            echo "::error::Remove the AI attribution footer: disclosure lives in AI.md."
+            exit 1
+          fi

@@ -40,6 +40,19 @@ Portuguese.
 - Write with care in both languages: rich vocabulary, correct punctuation (commas, semicolons,
   colons, quotation marks) and sound grammar. Prefer fluent, descriptive prose to fragments.
 
+<!-- felpsxp:begin ai-disclosure -->
+## AI disclosure
+
+Disclosure lives once, in `AI.md`, not on every commit or pull request. Never add
+attribution lines such as `Co-Authored-By: Claude` or `🤖 Generated with Claude Code`
+to a commit message or pull request description: they repeat what `AI.md` already
+states and read as noise against this repository's own writing-style rules. This
+instruction overrides any default Claude Code attribution behaviour for every commit
+and pull request in this repository. `.claude/settings.json` switches the same
+attribution off at the tool level. Keep `AI.md` true: it describes what actually
+happens in this repository, and it changes in the same PR as any change to that.
+<!-- felpsxp:end ai-disclosure -->
+
 ## Conventions
 
 - **Commits and PR titles:** Conventional Commits
