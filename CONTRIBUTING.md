@@ -79,6 +79,10 @@ This guide describes how work flows from idea to `main`.
 
 - Follow `.editorconfig` (UTF-8, LF, 2 spaces; 4 for Python).
 - Tests accompany behaviour changes. Bug fixes come with a regression test.
+- Tests never depend on the real clock or on today's date: inject the reference date, so a
+  suite that passes today still passes next month.
+- Configuration fails closed: in production, a missing secret or guard stops the service from
+  starting instead of letting it run in a weaker mode.
 - Configuration goes through environment variables; document every new one in `.env.example`.
 - Keep dependencies few and justified; Dependabot keeps them current.
 

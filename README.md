@@ -62,7 +62,6 @@ cp .env.example .env        # never commit .env
 .
 ├── .github/          # CI, Dependabot, CODEOWNERS, issue and PR templates
 ├── docs/adr/         # Architecture Decision Records
-├── scripts/          # helper scripts
 ├── CLAUDE.md         # persistent context for Claude Code
 └── ...
 ```

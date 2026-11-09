@@ -47,7 +47,7 @@ repos:
       - id: no-em-dash
         name: no em or en dashes in prose
         language: pygrep
-        entry: "\u2013|\u2014"
+        entry: "\u2013|\u2014|&[mn]dash;|&#821[12];"
         files: \.(md|mdx|txt)$
 
   # --- Stack-specific hooks: uncomment what the project uses ----------------
