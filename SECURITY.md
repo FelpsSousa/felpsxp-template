@@ -58,4 +58,5 @@ to demonstrate the issue. Personal data you may encounter must not be kept or sh
 - `gitleaks` runs in pre-commit and in CI over the full history.
 - Dependabot keeps dependencies and GitHub Actions current; actions are pinned to commit SHAs.
 - Workflows run with least-privilege `GITHUB_TOKEN` permissions.
-- Code scanning (CodeQL) and secret scanning with push protection are enabled in repository settings.
+- On public repositories, secret scanning with push protection is enabled in repository settings;
+  on private ones, `gitleaks` is the secret check.
