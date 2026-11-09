@@ -105,7 +105,9 @@ EOF
     ;;
 esac
 
-rm -f TEMPLATE.md CHANGELOG.md
+# These describe the template itself, not the new project.
+rm -f TEMPLATE.md CHANGELOG.md .github/ISSUE_TEMPLATE/template_proposal.yml
+rm -rf docs/template-adr
 rm -f -- "$0"
 rmdir scripts 2>/dev/null || true
 
