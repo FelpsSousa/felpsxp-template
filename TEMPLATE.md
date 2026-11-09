@@ -57,3 +57,4 @@ os checks `Hygiene & secrets` e `Conventional Commits title`. Quando houver mais
 
 - Mudou uma convenção? Altere aqui primeiro, depois propague para os repositórios existentes.
 - `pre-commit autoupdate` de tempos em tempos; o Dependabot cuida das Actions.
+- Decisões sobre o próprio template ficam em `docs/template-adr/`, que o script remove nos projetos.
