@@ -20,6 +20,10 @@ Repositório-modelo de todos os projetos FelpsXP. Este arquivo explica como usar
 | `.pre-commit-config.yaml` | higiene, gitleaks, detect-private-key, mensagem de commit, bloqueio de travessões em Markdown |
 | `.editorconfig`, `.gitattributes`, `.gitignore`, `.env.example` | padrões de editor, LF, segredos fora do git |
 | `.nvmrc` | versão do Node usada pelo CI (`lts/*`); fixe uma versão exata quando o projeto tiver stack JS |
+| `docs/runbooks/`, `docs/postmortems/` | procedimentos e incidentes, com modelo de postmortem |
+| `docs/showcase/` | checklist do que pode e do que nunca pode ir para o público |
+| `docs/security/web-headers.md` | linha de base de cabeçalhos para app web |
+| `CHANGELOG.md` | versões do próprio template; o script remove nos projetos |
 
 Actions fixadas por SHA de commit (com a tag no comentário); o Dependabot atualiza.
 
