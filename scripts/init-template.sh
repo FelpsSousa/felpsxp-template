@@ -3,17 +3,17 @@
 #
 #   ./scripts/init-template.sh --name felpsxp-news \
 #       --description "Bilingual AI-summarized news portal" \
-#       --fxp FXP-050 [--owner FelpsSousa] [--github]
+#       --fxp FXP-050 [--owner FelpsSousa] [--license mit|proprietary|none] [--github]
 #
 # What it does, in this order:
 #   1. Replaces {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}}, {{FXP_ID}} and {{OWNER}} in every text file.
 #   2. Enables the Dependabot blocks for the stacks it finds (package.json, pyproject.toml, Dockerfile).
-#   3. Removes TEMPLATE.md and this script.
+#   3. Applies --license (default: mit), then removes TEMPLATE.md, CHANGELOG.md and this script.
 #   4. Inside a git repository: creates the "chore: initialize from felpsxp-template" commit
 #      (bypassing the no-commit-to-branch hook only for this first commit).
 #   5. With --github (needs an authenticated `gh`): pushes that commit, then creates labels and
-#      applies repository settings (squash-only merges, branch auto-delete, secret scanning with
-#      push protection, private vulnerability reporting) and, last, the ruleset protecting main.
+#      applies repository settings (squash-only merges, branch auto-delete and, on public
+#      repositories, secret scanning and private vulnerability reporting) and, last, the ruleset.
 #      Protection comes after the push on purpose: the ruleset would reject a direct push.
 #   6. Installs the pre-commit hooks if pre-commit is available.
 set -euo pipefail
@@ -22,6 +22,7 @@ name="$(basename "$(pwd)")"
 description=""
 fxp="FXP-xxx"
 owner="FelpsSousa"
+license="mit"
 github=false
 
 while [[ $# -gt 0 ]]; do
@@ -30,6 +31,7 @@ while [[ $# -gt 0 ]]; do
     --description) description="$2"; shift 2 ;;
     --fxp) fxp="$2"; shift 2 ;;
     --owner) owner="$2"; shift 2 ;;
+    --license) license="$2"; shift 2 ;;
     --github) github=true; shift ;;
     -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
@@ -44,6 +46,11 @@ if [[ ! "$name" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
   echo "error: --name must be lowercase kebab-case (got '$name')" >&2
   exit 1
 fi
+
+case "$license" in
+  mit | proprietary | none) ;;
+  *) echo "error: --license must be mit, proprietary or none (got '$license')" >&2; exit 1 ;;
+esac
 
 root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$root"
@@ -69,7 +76,36 @@ enable_dependabot() {
 [[ -f pyproject.toml ]] && enable_dependabot pip
 [[ -f Dockerfile || -f docker/Dockerfile ]] && enable_dependabot docker
 
-rm -f TEMPLATE.md
+set_license_text() {
+  export TPL_LICENSE_EN="$1" TPL_LICENSE_PT="$2"
+  perl -ni -e 'print unless /^\[!\[License: MIT\]/' README.md
+  perl -pi -e 's/^\[MIT\]\(LICENSE\).*$/$ENV{TPL_LICENSE_EN}/' README.md
+  perl -pi -e 's/^\[MIT\]\(LICENSE\).*$/$ENV{TPL_LICENSE_PT}/' README.pt-BR.md
+}
+
+case "$license" in
+  proprietary)
+    cat >LICENSE <<EOF
+Copyright (c) $(date +%Y) Felipe Sousa. All rights reserved.
+
+This software and its accompanying documentation are proprietary and
+confidential. No part of this repository may be copied, modified,
+distributed, sublicensed, or used in any form without prior written
+permission from the copyright holder.
+EOF
+    set_license_text "Private and proprietary. See [LICENSE](LICENSE)." \
+      "Privado e proprietário. Veja o [LICENSE](LICENSE)."
+    echo "→ License: proprietary"
+    ;;
+  none)
+    rm -f LICENSE
+    set_license_text "No license is granted: all rights reserved." \
+      "Nenhuma licença é concedida: todos os direitos reservados."
+    echo "→ License: none (LICENSE removed)"
+    ;;
+esac
+
+rm -f TEMPLATE.md CHANGELOG.md
 rm -f -- "$0"
 rmdir scripts 2>/dev/null || true
 
@@ -84,6 +120,17 @@ fi
 if $github; then
   command -v gh >/dev/null || { echo "error: gh CLI not found" >&2; exit 1; }
   repo="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+  visibility="$(gh repo view --json visibility -q .visibility)"
+
+  # The reason a setting failed is only in the API error, so report that instead of guessing.
+  explain() {
+    if grep -q 'Upgrade to GitHub Pro' <<<"$2"; then
+      echo "  ! $1: not available on this plan for a private repository"
+    else
+      echo "  ! $1: $(head -n 1 <<<"$2")"
+    fi
+  }
+
   if $committed; then
     echo "→ Pushing the initial commit"
     git push -q origin HEAD
@@ -109,16 +156,21 @@ LABELS
     --delete-branch-on-merge >/dev/null
   gh api -X PATCH "repos/$repo" -f squash_merge_commit_title=PR_TITLE \
     -f squash_merge_commit_message=PR_BODY >/dev/null
-  gh api -X PUT "repos/$repo/private-vulnerability-reporting" >/dev/null ||
-    echo "  ! could not enable private vulnerability reporting (enable it in Settings → Security)"
-  gh api -X PATCH "repos/$repo" --input - >/dev/null <<'JSON' ||
+  if [[ "$visibility" == "PUBLIC" ]]; then
+    out="$(gh api -X PUT "repos/$repo/private-vulnerability-reporting" 2>&1)" ||
+      explain "private vulnerability reporting" "$out"
+    out="$(gh api -X PATCH "repos/$repo" --input - 2>&1 <<'JSON'
 {"security_and_analysis":{"secret_scanning":{"status":"enabled"},"secret_scanning_push_protection":{"status":"enabled"}}}
 JSON
-    echo "  ! could not enable secret scanning (private repos may need GitHub Advanced Security)"
+    )" || explain "secret scanning" "$out"
+  else
+    echo "→ Private repository: GitHub secret scanning is not applied; gitleaks covers it in pre-commit and CI"
+  fi
 
   # Protect main: PRs only, linear history, required checks. No required approvals,
   # because a solo maintainer cannot approve their own PR.
-  gh api -X POST "repos/$repo/rulesets" --input - >/dev/null <<'JSON' ||
+  protected=false
+  if out="$(gh api -X POST "repos/$repo/rulesets" --input - 2>&1 <<'JSON'
 {
   "name": "protect-main",
   "target": "branch",
@@ -142,7 +194,12 @@ JSON
   ]
 }
 JSON
-    echo "  ! could not create the ruleset (it may already exist)"
+  )"; then
+    protected=true
+  else
+    explain "ruleset protect-main" "$out"
+  fi
+  $protected || echo "  ! main is NOT protected: AI.md must not claim branch protection until it is"
 fi
 
 
@@ -157,6 +214,6 @@ cat <<EOF
 ✔ $name is ready. Next:
   1. Settings → Code security: enable CodeQL "default setup" and Dependabot security updates.
   2. Fill in README.md, README.pt-BR.md and CLAUDE.md (overview, stack, commands).
-  3. Write ADR-0002 with the project's first real decision.
+  3. Write ADR-0002 with the project's first real decision, and make AI.md true for this project.
   4. From now on, work on branches and open PRs; main only changes through them.
 EOF

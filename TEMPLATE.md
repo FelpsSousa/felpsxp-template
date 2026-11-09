@@ -45,7 +45,7 @@ correspondente no `.github/dependabot.yml` à mão (descomente entre `# npm-star
 
 - **Settings → Code security:** CodeQL *default setup* e Dependabot security updates.
 - Repositório privado: secret scanning pode exigir GitHub Advanced Security.
-- Projeto **não open source** (ex.: `beecrowd-problem-solving`): apague o `LICENSE` e o badge.
+- Projeto **não open source**: use `--license proprietary` (o sentinel é o modelo) ou `--license none` (o caso do `beecrowd-problem-solving`). O script cuida do `LICENSE`, do badge e do rodapé dos READMEs.
 
 ## Por que a proteção de `main` não exige aprovação
 
