@@ -41,6 +41,15 @@ repos:
         stages: [commit-msg]
         args: [feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, security]
 
+  # --- AI disclosure lives in AI.md, not in commit messages -------------------
+  - repo: local
+    hooks:
+      - id: no-ai-attribution
+        name: no AI attribution footer in commit messages
+        language: pygrep
+        entry: '(?i)^\s*(co-authored-by:.*(claude|anthropic)|\S*\s*generated with .*claude)'
+        stages: [commit-msg]
+
   # --- Writing style: no em or en dashes in prose ----------------------------
   - repo: local
     hooks:

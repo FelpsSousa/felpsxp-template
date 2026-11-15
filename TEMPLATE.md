@@ -12,6 +12,8 @@ Repositório-modelo de todos os projetos FelpsXP. Este arquivo explica como usar
 | `CONTRIBUTING.md` | fluxo issue → branch → Conventional Commits → PR squash |
 | `SECURITY.md` | reporte privado via GitHub Advisories, prazos realistas para quem toca sozinho |
 | `CLAUDE.md` | contexto persistente do Claude Code: princípios, regra de escrita, stack padrão, convenções |
+| `AI.md` | divulgação única do uso de IA; ajuste o que ele afirma para ser verdade neste projeto (quem faz os commits, se há proteção de branch) |
+| `.claude/settings.json` | desliga na ferramenta o rodapé de atribuição do Claude Code em commits e PRs |
 | `docs/adr/` | ADR-0001 (por que usamos ADRs), template MADR e índice |
 | `.github/workflows/ci.yml` | pre-commit + gitleaks no histórico inteiro; jobs Node/Python só se o stack existir |
 | `.github/workflows/pr-title.yml` | valida título de PR em Conventional Commits |

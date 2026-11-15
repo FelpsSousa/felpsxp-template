@@ -64,6 +64,8 @@ This guide describes how work flows from idea to `main`.
 
 5. **Open a pull request.** The PR **title** must also be a Conventional Commit, because
    PRs are **squash-merged** and the title becomes the commit on `main`. Fill in the template.
+   Pull request descriptions and commit messages carry no AI-attribution footer:
+   disclosure lives once, in [`AI.md`](AI.md).
 6. **CI must be green** before merging; CODEOWNERS are requested for review automatically.
 7. **Delete the branch** after merge.
 
