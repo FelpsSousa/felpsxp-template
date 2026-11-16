@@ -1,0 +1,31 @@
+name: Template proposal
+description: A practice proven in a project that should reach every repository.
+title: "feat: <short description>"
+labels: ["type: feature", "status: triage"]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Where it was proven
+      description: Repository and pull request or file.
+    validations:
+      required: true
+  - type: textarea
+    id: practice
+    attributes:
+      label: The practice
+      description: What it does, and what went wrong without it.
+    validations:
+      required: true
+  - type: dropdown
+    id: class
+    attributes:
+      label: How it should sync
+      description: See docs/template-adr/0002-template-synchronization.md.
+      options:
+        - Managed (replaced on every sync)
+        - Seeded (created once, owned by the project)
+        - Block (a marked section of a shared file)
+        - Documentation only
+    validations:
+      required: true
