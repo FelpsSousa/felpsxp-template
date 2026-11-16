@@ -6,9 +6,10 @@
 #       --fxp FXP-050 [--owner FelpsSousa] [--license mit|proprietary|none] [--github]
 #
 # What it does, in this order:
-#   1. Replaces {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}}, {{FXP_ID}} and {{OWNER}} in every text file.
+#   1. Replaces {{PROJECT_NAME}}, {{PROJECT_DESCRIPTION}}, {{FXP_ID}} and {{OWNER}} in every text file,
+#      then moves skeleton/README.md and skeleton/README.pt-BR.md over the template's own READMEs.
 #   2. Enables the Dependabot blocks for the stacks it finds (package.json, pyproject.toml, Dockerfile).
-#   3. Applies --license (default: mit), then removes TEMPLATE.md, CHANGELOG.md and this script.
+#   3. Applies --license (default: mit), then removes CHANGELOG.md, the template ADRs and this script.
 #   4. Inside a git repository: creates the "chore: initialize from felpsxp-template" commit
 #      (bypassing the no-commit-to-branch hook only for this first commit).
 #   5. With --github (needs an authenticated `gh`): pushes that commit, then creates labels and
@@ -57,7 +58,7 @@ cd "$root"
 
 echo "→ Filling placeholders for $name ($fxp)"
 export TPL_NAME="$name" TPL_DESC="$description" TPL_FXP="$fxp" TPL_OWNER="$owner"
-grep -rIl --exclude-dir=.git --exclude=init-template.sh --exclude=TEMPLATE.md \
+grep -rIl --exclude-dir=.git --exclude=init-template.sh \
   -e '{{PROJECT_NAME}}' -e '{{PROJECT_DESCRIPTION}}' -e '{{FXP_ID}}' -e '{{OWNER}}' . |
   while IFS= read -r file; do
     perl -pi -e 's/\{\{PROJECT_NAME\}\}/$ENV{TPL_NAME}/g;
@@ -65,6 +66,12 @@ grep -rIl --exclude-dir=.git --exclude=init-template.sh --exclude=TEMPLATE.md \
                  s/\{\{FXP_ID\}\}/$ENV{TPL_FXP}/g;
                  s/\{\{OWNER\}\}/$ENV{TPL_OWNER}/g' "$file"
   done
+
+# The template's own READMEs describe the template; the project's READMEs live in skeleton/.
+echo "→ Installing the project README (skeleton/)"
+mv -f skeleton/README.md README.md
+mv -f skeleton/README.pt-BR.md README.pt-BR.md
+rmdir skeleton
 
 enable_dependabot() {
   local block="$1"
@@ -106,7 +113,7 @@ EOF
 esac
 
 # These describe the template itself, not the new project.
-rm -f TEMPLATE.md CHANGELOG.md .github/ISSUE_TEMPLATE/template_proposal.yml
+rm -f CHANGELOG.md .github/ISSUE_TEMPLATE/template_proposal.yml
 rm -rf docs/template-adr
 rm -f -- "$0"
 rmdir scripts 2>/dev/null || true

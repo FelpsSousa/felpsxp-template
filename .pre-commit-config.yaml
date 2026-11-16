@@ -16,6 +16,8 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
         args: [--fix=lf]
+        # .gitattributes checks out .ps1, .cmd and .bat with CRLF on purpose (Windows).
+        exclude: \.(ps1|cmd|bat)$
       - id: check-yaml
       - id: check-json
       - id: check-toml

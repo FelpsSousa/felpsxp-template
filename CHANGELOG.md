@@ -5,6 +5,12 @@ init script removes it.
 
 ## Unreleased
 
+- The root README now describes the template itself, in both languages, and the project READMEs
+  move to `skeleton/`, installed by the init script; `TEMPLATE.md` is folded into the READMEs.
+- Project README skeleton with "What this is", "Highlights", "Stack" and "Documentation" sections,
+  after the shape that worked in felpsxp-hub.
+- The `mixed-line-ending` hook skips `.ps1`, `.cmd` and `.bat`, which `.gitattributes` checks out
+  with CRLF (it failed on felpsxp-control's first PowerShell scripts).
 - AI disclosure: `AI.md`, a `CLAUDE.md` section, `.claude/settings.json`, and checks that keep
   attribution footers out of commits and pull requests (#3).
 - CI audits dependencies in the Node and Python jobs; the writing-style hook also catches dashes
